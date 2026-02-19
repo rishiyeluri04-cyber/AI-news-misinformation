@@ -12,9 +12,11 @@ import re
 import string
 import logging
 import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer, PorterStemmer
+import os
+
+# Configure NLTK data path for serverless environments (read-only FS)
+if os.environ.get('VERCEL') or os.path.exists('/tmp'):
+    nltk.data.path.append('/tmp')
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +24,26 @@ logger = logging.getLogger(__name__)
 NLTK_PACKAGES = ['punkt', 'stopwords', 'wordnet', 'omw-1.4', 'punkt_tab']
 for pkg in NLTK_PACKAGES:
     try:
-        nltk.download(pkg, quiet=True)
+        # Try to find it first to avoid redundant downloads
+        try:
+            if pkg == 'punkt': nltk.data.find('tokenizers/punkt')
+            elif pkg == 'stopwords': nltk.data.find('corpora/stopwords')
+            elif pkg == 'wordnet': nltk.data.find('corpora/wordnet')
+            else: nltk.data.find(pkg)
+        except LookupError:
+             # Download to /tmp if not found
+             download_dir = '/tmp' if os.path.exists('/tmp') else None
+             if download_dir:
+                 nltk.download(pkg, download_dir=download_dir, quiet=True)
+             else:
+                 nltk.download(pkg, quiet=True)
     except Exception as e:
         logger.warning(f"Could not download NLTK package '{pkg}': {e}")
+
+# Import NLTK modules AFTER download
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer, PorterStemmer
 
 # Initialize NLP tools
 _lemmatizer = WordNetLemmatizer()
