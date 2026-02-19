@@ -11,8 +11,13 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
 # Ensure directories exist
-for d in [MODEL_DIR, DATA_DIR, LOGS_DIR]:
-    os.makedirs(d, exist_ok=True)
+# On Vercel, the filesystem is read-only except for /tmp
+if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+    # We only need to read models, not write logs/data in prod
+    pass
+else:
+    for d in [MODEL_DIR, DATA_DIR, LOGS_DIR]:
+        os.makedirs(d, exist_ok=True)
 
 # Model settings
 MODEL_PATH = os.path.join(MODEL_DIR, 'best_model.joblib')
