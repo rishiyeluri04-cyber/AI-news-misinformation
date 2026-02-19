@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruthLens Presentation</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #a855f7;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .slide-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem;
+      position: relative;
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent),
+        radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.1), transparent);
+    }
+
+    .slide-content {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: var(--primary);
+      border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+      padding-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    ul {
+      list-style: none;
+      font-size: 1.5rem;
+      line-height: 1.6;
+    }
+
+    li {
+      margin-bottom: 1.2rem;
+      padding-left: 2rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    .active li {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--secondary);
+      font-weight: bold;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 1rem;
+      z-index: 100;
+    }
+
+    button {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      transition: width 0.3s;
+    }
+
+    .slide-num {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 2.5rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+    }
+
+    .title-slide {
+      text-align: center;
+    }
+
+    .title-slide h1 {
+      font-size: 5.5rem;
+    }
+
+    .title-slide p {
+      font-size: 1.8rem;
+      color: var(--text-dim);
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-cols: 2;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .tech-item {
+      background: var(--card);
+      padding: 1rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="slide-container" id="container">
+    <!-- Slide 1 -->
+    <div class="slide title-slide active">
+      <div class="slide-content">
+        <p>PRESENTATION</p>
+        <h1>TruthLens</h1>
+        <p>AI-Based Fake News Detection System</p>
+        <div style="margin-top: 3rem; font-size: 1.2rem; color: var(--primary)">Combating Misinformation with Machine
+          Learning & NLP</div>
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>1. Introduction</h2>
+        <ul>
+          <li>AI/NLP driven detection for high-stakes news environments.</li>
+          <li>Automated classification as Real or Fake.</li>
+          <li>Objective: Neutralize misinformation at the source.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>2. Problem Statement</h2>
+        <ul>
+          <li>Digital platforms have exponentialized the spread of 'Fake News'.</li>
+          <li>Manual fact-checking is too slow for 21st-century information cycles.</li>
+          <li>Need for high-volume, automated verification tools.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>3. Objectives</h2>
+        <ul>
+          <li>Real-time prediction and categorization.</li>
+          <li>High precision and recall for investigative use.</li>
+          <li>Promote a responsible, truth-driven digital ecosystem.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>4. System Architecture</h2>
+        <ul>
+          <li>Input Processing → Text Cleaning (NLTK)</li>
+          <li>Vectorization (TF-IDF) → Dimensionality Reduction</li>
+          <li>Inference (ML Ensemble) → Gemini AI Verification</li>
+          <li>Dynamic UI Output View.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>5. Functional Requirements</h2>
+        <ul>
+          <li>Multi-format support (Direct Text & File Uploads).</li>
+          <li>Comprehensive Preprocessing (Stemming/Stop-words).</li>
+          <li>Dual-Verification (Traditional ML + Generative AI).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>6. Non-Functional Requirements</h2>
+        <ul>
+          <li>Speed: Latency < 3 seconds globally.</li>
+          <li>Accuracy: Minimum 85% validation threshold.</li>
+          <li>Design: Modern Responsive UI with sleek aesthetics.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>7. Technology Stack</h2>
+        <ul>
+          <li>Frontend: Next.js 14, React, Framer Motion.</li>
+          <li>Backend: Python 3.10, Flask Micro-framework.</li>
+          <li>Core: Scikit-learn, Pandas, NumPy, Gemini 1.5 API.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>8. Performance Metrics</h2>
+        <ul>
+          <li>Primary Metric: Overall Accuracy.</li>
+          <li>Secondary: Precision, Recall, and F1-Score.</li>
+          <li>Explainability: Keyword contribution mapping.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>9. Future Enhancements</h2>
+        <ul>
+          <li>Transformer integration (BERT/GPT Fine-tuning).</li>
+          <li>Global Language Support (i18n).</li>
+          <li>Browser Extension & Social Media bot integration.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>10. Conclusion</h2>
+        <ul>
+          <li>TruthLens provides a scalable, reliable shield against misinformation.</li>
+          <li>Automated truth-detection is no longer a luxury, but a necessity.</li>
+          <li>The future of journalism is AI-augmented and Fact-verified.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prev">PREV</button>
+    <button id="next">NEXT</button>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div class="slide-num" id="slideNum">SLIDE 1 / 11</div>
+
+  <script>
+    let currentSlide = 0;
+    const totalSlides = 11;
+    const container = document.getElementById('container');
+    const slides = document.querySelectorAll('.slide');
+    const progress = document.getElementById('progress');
+    const slideNum = document.getElementById('slideNum');
+
+    function updateSlide() {
+      container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+      slides.forEach((s, i) => {
+        if (i === currentSlide) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      progress.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+      slideNum.innerText = `SLIDE ${currentSlide + 1} / ${totalSlides}`;
+    }
+
+    document.getElementById('next').onclick = () => {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    };
+
+    document.getElementById('prev').onclick = () => {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') document.getElementById('next').click();
+      if (e.key === 'ArrowLeft') document.getElementById('prev').click();
+    });
+  </script>
+</body>
+
+</html>
