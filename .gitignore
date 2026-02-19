@@ -38,3 +38,6 @@ Thumbs.db
 # Keep model files (small, needed for deployment)
 !backend/models/*.joblib
 !backend/models/*.json
+
+
+nextapp/backend

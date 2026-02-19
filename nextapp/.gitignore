@@ -42,3 +42,5 @@ Thumbs.db
 # Keep model files (they're small)
 !backend/models/*.joblib
 !backend/models/*.json
+
+.vercel

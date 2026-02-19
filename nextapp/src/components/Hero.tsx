@@ -1,183 +1,96 @@
 "use client";
 import { motion } from "framer-motion";
-import { SystemStatus } from "@/lib/types";
+import Detector from "./Detector";
+
+import { PredictionResult } from "@/lib/types";
 
 interface HeroProps {
-  status: SystemStatus | null;
-  accuracy: number | null;
+  status: string;
+  accuracy: string;
+  onAnalyze: (data: PredictionResult | null) => void;
 }
 
-export default function Hero({ status, accuracy }: HeroProps) {
+export default function Hero({ status, accuracy, onAnalyze }: HeroProps) {
+  const modelReady = status.includes("ready") || status.includes("trained");
+
   return (
-    <section
-      className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden dark:bg-[#070711] bg-slate-50 transition-colors duration-300"
-      id="hero"
-      aria-label="Introduction"
-    >
-      {/* Animated background orbs - adjusted opacity for light mode */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="orb-1 absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-indigo-600/10 dark:bg-indigo-600/20 blur-[100px]" />
-        <div className="orb-2 absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-purple-600/10 dark:bg-purple-600/15 blur-[120px]" />
-        <div className="orb-3 absolute top-3/4 left-1/2 w-64 h-64 rounded-full bg-violet-500/10 dark:bg-violet-500/10 blur-[80px]" />
-        {/* Grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.025]"
-          style={{
-            backgroundImage: "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-            color: "inherit"
-          }}
-        />
+    <section className="relative pt-24 pb-12 md:pt-32 md:pb-24 overflow-hidden min-h-screen">
+      {/* Background Gradients */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#135bec]/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 md:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: content */}
-          <div className="text-center lg:text-left z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+
+          {/* Left Column: Text & Stats */}
+          <div className="lg:col-span-5 flex flex-col gap-8 pt-4 lg:pt-8">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/[0.12] border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-xs font-semibold tracking-wide mb-6 shadow-sm"
-              role="status"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#135bec]/10 border border-[#135bec]/20 text-[#135bec] text-xs font-bold uppercase tracking-wider w-fit"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 badge-pulse-dot" aria-hidden="true" />
-              ML + Gemini AI · Real-Time · 90%+ Accuracy
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Next-Gen Verification
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6 text-slate-900 dark:text-white"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-white tracking-tight"
             >
-              Stop Misinformation
-              <br />
-              <span className="gradient-text">Before It Spreads</span>
+              Uncover the Truth with <span className="text-[#135bec]">AI-Driven</span> Analysis
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0"
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-lg text-slate-400 leading-relaxed"
             >
-              TruthLens uses advanced ML and Google Gemini AI to instantly classify
-              news articles as <strong className="text-slate-900 dark:text-slate-200">Real</strong> or{" "}
-              <strong className="text-slate-900 dark:text-slate-200">Fake</strong> — with confidence
-              scoring, keyword explainability, and deep contextual analysis.
+              Leverage advanced machine learning and real-time cross-referencing to verify headlines, articles, and large datasets in seconds. Designed for journalists, researchers, and you.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-14"
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="grid grid-cols-2 gap-4 mt-2"
             >
-              <a
-                href="#detector"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:from-indigo-500 hover:to-purple-500 transition-all duration-200 shadow-xl shadow-indigo-600/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-[#070711]"
-                aria-label="Start analyzing an article"
-              >
-                Analyze an Article
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </a>
-              <a
-                href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 font-medium transition-all duration-200 bg-white dark:bg-transparent shadow-sm dark:shadow-none focus:outline-none focus:ring-2 focus:ring-slate-500"
-              >
-                How It Works
-              </a>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap justify-center lg:justify-start items-center gap-0 text-slate-900 dark:text-white"
-            >
-              {[
-                { value: accuracy ? `${accuracy}%` : "100%", label: "Accuracy" },
-                { value: "4", label: "ML Models" },
-                { value: "<3s", label: "Response" },
-                { value: "20K+", label: "Trained On" },
-              ].map((s, i) => (
-                <div key={i} className="flex items-center">
-                  {i > 0 && <div className="w-px h-10 bg-slate-200 dark:bg-white/10 mx-4 sm:mx-6" aria-hidden="true" />}
-                  <div className="text-center">
-                    <div
-                      className="text-2xl font-bold gradient-text"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
-                      {s.value}
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-500 font-medium">{s.label}</div>
-                  </div>
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#1e293b]/50 backdrop-blur-sm">
+                <div className="text-[#135bec] mb-2">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                 </div>
-              ))}
+                <div className="text-2xl font-bold text-white mb-1">{accuracy || "98.4%"}</div>
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Model Accuracy</div>
+              </div>
+
+              <div className="p-5 rounded-xl border border-slate-800 bg-[#1e293b]/50 backdrop-blur-sm">
+                <div className="text-[#135bec] mb-2">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div className="text-2xl font-bold text-white mb-1">1M+</div>
+                <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Verified Articles</div>
+              </div>
             </motion.div>
           </div>
 
-          {/* Right: floating cards (Hidden on mobile to focus on CTA) */}
-          <div className="relative h-[420px] hidden lg:block" aria-hidden="true">
-            <div className="float-c1 absolute top-[10%] left-[5%] dark:glass bg-white/80 backdrop-blur-xl border border-red-100 dark:border-red-500/20 rounded-2xl p-4 flex items-center gap-3 shadow-2xl dark:shadow-none min-w-[200px]">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15 border border-red-200 dark:border-red-500/20 flex items-center justify-center text-red-500 dark:text-red-400 font-bold text-lg">✗</div>
-              <div>
-                <div className="text-red-600 dark:text-red-400 font-bold text-sm">FAKE</div>
-                <div className="text-slate-500 text-xs">Confidence: 97.2%</div>
-              </div>
-            </div>
-
-            <div className="float-c2 absolute top-[42%] right-0 dark:glass bg-white/80 backdrop-blur-xl border border-emerald-100 dark:border-emerald-500/20 rounded-2xl p-4 flex items-center gap-3 shadow-2xl dark:shadow-none min-w-[200px]">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-lg">✓</div>
-              <div>
-                <div className="text-emerald-700 dark:text-emerald-400 font-bold text-sm">REAL</div>
-                <div className="text-slate-500 text-xs">Confidence: 94.8%</div>
-              </div>
-            </div>
-
-            <div className="float-c3 absolute bottom-[8%] left-[18%] dark:glass bg-white/80 backdrop-blur-xl border border-indigo-100 dark:border-white/10 rounded-2xl p-4 flex items-center gap-3 shadow-2xl dark:shadow-none min-w-[230px]">
-              <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/15 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-content-center flex justify-center text-lg">🔍</div>
-              <div>
-                <div className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold">Gemini AI Analysis</div>
-                <div className="text-slate-500 text-xs">Credibility: 8/10</div>
-              </div>
-            </div>
-
-            {/* Status badge */}
-            <div className="absolute top-0 right-[8%] dark:glass bg-white/90 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 flex items-center gap-2 shadow-lg">
-              <div className={`w-2 h-2 rounded-full ${status?.model_ready ? "bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400" : "bg-amber-400"}`} />
-              <span className="text-xs text-slate-600 dark:text-slate-400">
-                {status?.model_ready ? "Model Ready" : "Model Loading"}
-              </span>
-              {status?.gemini_available && (
-                <>
-                  <span className="text-slate-400 dark:text-slate-600">·</span>
-                  <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Gemini Active</span>
-                </>
-              )}
-            </div>
+          {/* Right Column: Detector Interface */}
+          <div className="lg:col-span-7">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              <Detector modelReady={modelReady} onAnalyze={onAnalyze} />
+            </motion.div>
           </div>
+
         </div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-400 dark:text-slate-600"
-        aria-hidden="true"
-      >
-        <span className="text-[10px] uppercase tracking-widest">Scroll</span>
-        <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </motion.div>
     </section>
   );
 }

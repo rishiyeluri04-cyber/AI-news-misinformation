@@ -1,31 +1,38 @@
 @import "tailwindcss";
 
-/* ── Tailwind v4 dark mode via .dark class ── */
+/* ── Tailwind v4 dark mode strategy ── */
 @variant dark (&:where(.dark, .dark *));
 
 /* ────────────────────────────────────────────
-   CSS Custom Properties — PERMANENT DARK THEME
+   STITCH DESIGN SYSTEM TOKENS (VeriFact AI)
    ──────────────────────────────────────────── */
 :root {
-  /* Default to Dark Mode values */
-  --bg-base: #070711;
-  --bg-card: #0d0d1a;
-  --bg-card2: #0f0f1e;
-  --bg-glass: rgba(255, 255, 255, 0.03);
-  --text-primary: #e2e8f0;
+  /* Core Colors from Stitch */
+  --color-primary: #135bec;
+  /* Blue */
+  --bg-base: #101622;
+  /* Dark Background */
+  --bg-card: #1e293b;
+  /* Slate-800 equivalent for cards */
+  --bg-light: #f6f6f8;
+  /* Light Background (unused in dark mode) */
+
+  /* Text */
+  --text-primary: #ffffff;
   --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(99, 102, 241, 0.4);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --orb-opacity: 0.20;
+  /* Slate-400 */
+  --text-muted: #64748b;
+  /* Slate-500 */
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.1);
+  --border-focus: #135bec;
 }
 
 /* ── Base / Reset ── */
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-space: 'Space Grotesk', sans-serif;
   }
 
   * {
@@ -35,8 +42,8 @@
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
-    /* Force dark background immediately */
     background-color: var(--bg-base);
+    /* Permanent Dark */
     color: var(--text-primary);
   }
 
@@ -47,219 +54,42 @@
   }
 
   ::selection {
-    background: rgba(99, 102, 241, 0.25);
+    background: rgba(19, 91, 236, 0.3);
+    /* Primary with opacity */
     color: #fff;
   }
-
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--bg-base);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3);
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #6366f1;
-  }
 }
 
-/* ── Semantic helpers (use-anywhere classes) ── */
-.bg-base {
-  background-color: var(--bg-base);
+/* ── Utility Classes matching Stitch ── */
+.text-primary {
+  color: var(--color-primary);
 }
 
-.bg-card {
-  background-color: var(--bg-card);
+.bg-primary {
+  background-color: var(--color-primary);
 }
 
-.bg-card2 {
-  background-color: var(--bg-card2);
+.border-primary {
+  border-color: var(--color-primary);
 }
 
-.text-prim {
-  color: var(--text-primary);
-}
-
-.text-sec {
-  color: var(--text-secondary);
-}
-
-.text-mut {
-  color: var(--text-muted);
-}
-
-.border-theme {
-  border-color: var(--border);
-}
-
-/* ── Gradient text ── */
-.gradient-text {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gemini-gradient-text {
-  background: linear-gradient(135deg, #4285f4 0%, #9b59b6 50%, #ea4335 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Glass card ── */
-.glass {
-  background: var(--bg-glass);
+.glass-panel {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  transition: background 0.3s ease, border-color 0.3s ease;
-}
-
-/* ── Orbs ── */
-@keyframes orbFloat1 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  33% {
-    transform: translate(80px, -60px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-40px, 40px) scale(0.95);
-  }
-}
-
-@keyframes orbFloat2 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  33% {
-    transform: translate(-60px, 80px) scale(0.9);
-  }
-
-  66% {
-    transform: translate(80px, -40px) scale(1.05);
-  }
-}
-
-@keyframes orbFloat3 {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate(40px, 60px) scale(1.08);
-  }
-}
-
-.orb-1 {
-  animation: orbFloat1 18s ease-in-out infinite;
-}
-
-.orb-2 {
-  animation: orbFloat2 22s ease-in-out infinite;
-}
-
-.orb-3 {
-  animation: orbFloat3 26s ease-in-out infinite;
 }
 
 /* ── Animations ── */
-.confidence-bar {
-  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.credibility-bar {
-  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes chipPop {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.75);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 
-.chip-animate {
-  animation: chipPop 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.slide-up {
-  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes floatCard {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-14px) rotate(0.4deg);
-  }
-}
-
-.float-c1 {
-  animation: floatCard 6s ease-in-out infinite;
-}
-
-.float-c2 {
-  animation: floatCard 6s 2s ease-in-out infinite;
-}
-
-.float-c3 {
-  animation: floatCard 6s 4s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 8px #6366f1;
-  }
-
-  50% {
-    box-shadow: 0 0 18px #6366f1, 0 0 32px #6366f1;
-  }
-}
-
-.badge-pulse-dot {
-  animation: badgePulse 2.2s ease-in-out infinite;
-}
-
-/* ── Theme transition ── */
-* {
-  /* Removed lengthy transition for solid feels */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
 }

@@ -3,29 +3,15 @@ import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { predictText, predictFile } from "@/lib/api";
 import type { PredictionResult, TabType } from "@/lib/types";
-import ResultPanel from "./ResultPanel";
 
-const EXAMPLES = {
-  real: [
-    `Scientists at MIT published findings in Nature showing a direct link between sleep quality and cognitive function in adults aged 35–54. The peer-reviewed study tracked 2,340 participants over 18 months and found that consistent sleep below 6 hours significantly impaired memory consolidation and decision-making.`,
-    `The Federal Reserve announced interest rates would remain at 5.25% following its meeting on Wednesday. Fed Chair stated that economic data continues to show resilience and that the committee will remain data-dependent in future decisions regarding monetary policy. Markets responded positively.`,
-  ],
-  fake: [
-    `BREAKING: Scientists HIDE evidence that common vitamin D supplements CURES cancer to protect Big Pharma profits! The CDC has been suppressing this information for years — here's the proof they DON'T want you to see! Share before deleted!`,
-    `SHOCKING: Government plans to microchip the entire population by 2025 — whistleblower exposes everything! New 5G towers are causing brain cancer! Hollywood actor ARRESTED for human trafficking — mainstream media REFUSES to report!`,
-  ],
-};
-
-export default function Detector({ modelReady }: { modelReady: boolean }) {
+export default function Detector({ modelReady, onAnalyze }: { modelReady: boolean; onAnalyze: (data: PredictionResult | null) => void }) {
   const [tab, setTab] = useState<TabType>("text");
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<PredictionResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
+  const [deepScan, setDeepScan] = useState(false);
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
 
@@ -34,258 +20,151 @@ export default function Detector({ modelReady }: { modelReady: boolean }) {
     if (!text.trim()) { setError("Please enter a news article or headline."); return; }
     if (text.trim().length < 20) { setError("Input too short — please provide at least 20 characters."); return; }
     setLoading(true);
-    // Announce loading to screen readers
-    const announce = document.getElementById("a11y-announcer");
-    if (announce) announce.textContent = "Analyzing content, please wait.";
 
     try {
       const data = await predictText(text);
-      setResult(data);
-      if (announce) announce.textContent = "Analysis complete. Viewing results below.";
-      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      onAnalyze(data);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to connect to the server.");
-      if (announce) announce.textContent = "Analysis failed. Error: " + (e instanceof Error ? e.message : "unknown error");
     } finally {
       setLoading(false);
     }
-  }, [text]);
+  }, [text, onAnalyze]);
 
   const handleFileAnalyze = useCallback(async () => {
     if (!file) { setError("Please select a file."); return; }
     setLoading(true); setError("");
     try {
       const data = await predictFile(file);
-      setResult(data);
+      onAnalyze(data);
       setTab("text");
-      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "File processing failed.");
     } finally {
       setLoading(false);
     }
-  }, [file]);
+  }, [file, onAnalyze]);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault(); setDragOver(false);
-    const f = e.dataTransfer.files[0];
-    if (f) setFile(f);
-  };
-
-  const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    {
-      id: "text",
-      label: "Text",
-      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
-    },
-    {
-      id: "file",
-      label: "File",
-      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>,
-    },
-    {
-      id: "examples",
-      label: "Examples",
-      icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>,
-    },
+  const TABS = [
+    { id: "text", label: "Text Input", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg> },
+    { id: "file", label: "File Upload", icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg> },
   ];
 
   return (
-    <section id="detector" className="py-16 md:py-24" aria-label="Fake News Detector Tool">
-      {/* Hidden announcer for screen readers */}
-      <div id="a11y-announcer" className="sr-only" aria-live="polite"></div>
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e293b] shadow-2xl overflow-hidden" id="detector">
+      {/* Tabs Styled from Stitch */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id as TabType)}
+            className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold border-b-2 transition-colors duration-200 ${tab === t.id
+                ? "border-[#135bec] text-[#135bec] bg-[#135bec]/5"
+                : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              }`}
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/[0.1] border border-indigo-200 dark:border-indigo-500/25 text-indigo-600 dark:text-indigo-400 text-xs font-semibold uppercase tracking-widest mb-4">
-            Detector
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-slate-900 dark:text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Analyze Your Article
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
-            Paste any news headline or full article. Our dual AI will classify it in seconds.
-          </p>
-        </div>
+      {/* Input Content */}
+      <div className="p-6">
+        <AnimatePresence mode="wait">
+          {tab === "text" && (
+            <motion.div key="text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className="relative">
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Paste your article content or news headline here for instant verification..."
+                  className="w-full min-h-[300px] p-5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#135bec] focus:border-transparent transition-all resize-none font-sans"
+                />
+                <div className="absolute bottom-4 right-4 text-xs text-slate-400 font-medium bg-slate-50/50 dark:bg-slate-900/50 px-2 rounded">
+                  {wordCount} / 10,000 words
+                </div>
+              </div>
 
-        {/* Status banner */}
-        {!modelReady && (
-          <div className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-500/[0.08] border border-amber-200 dark:border-amber-500/25 text-amber-700 dark:text-amber-400 text-sm" role="alert">
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-            </svg>
-            <span>Model not trained. Run <code className="bg-amber-100 dark:bg-black/30 px-1.5 py-0.5 rounded text-xs font-mono text-amber-900 dark:text-amber-300">START.bat</code> first.</span>
-          </div>
-        )}
+              {error && (
+                <div className="text-red-500 text-sm font-medium px-2 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {error}
+                </div>
+              )}
 
-        {/* Detector card */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="rounded-2xl border border-slate-200 dark:border-white/[0.07] bg-white dark:bg-[#0d0d1a]/80 dark:backdrop-blur-xl overflow-hidden shadow-xl dark:shadow-2xl"
-        >
-          {/* Tabs */}
-          <div className="flex gap-1 p-2 md:p-3 border-b border-slate-100 dark:border-white/[0.06] bg-slate-50/[0.5] dark:bg-white/[0.02]" role="tablist">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                role="tab"
-                aria-selected={tab === t.id}
-                aria-controls={`panel-${t.id}`}
-                className={`flex-1 flex items-center justify-center gap-2 px-3 md:px-4 py-2 rounded-lg md:rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${tab === t.id
-                    ? "bg-white dark:bg-indigo-600/20 text-indigo-600 dark:text-indigo-300 border border-slate-200 dark:border-indigo-500/30 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/[0.04]"
-                  }`}
-              >
-                {t.icon}
-                {t.label}
-              </button>
-            ))}
-          </div>
+              <div className="flex flex-col sm:flex-row items-center justify-between pt-2 gap-4">
+                <label className="flex items-center gap-2 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    checked={deepScan}
+                    onChange={(e) => setDeepScan(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-600 text-[#135bec] focus:ring-[#135bec] bg-transparent w-4 h-4"
+                  />
+                  <span className="text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+                    Deep scan sources
+                  </span>
+                </label>
 
-          <div className="p-4 md:p-6" id={`panel-${tab}`} role="tabpanel">
-            <AnimatePresence mode="wait">
-              {tab === "text" && (
-                <motion.div key="text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <div className="relative">
-                    <label htmlFor="article-input" className="sr-only">Article Text</label>
-                    <textarea
-                      id="article-input"
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      placeholder={"Paste a news headline or full article here…\n\nExample: 'Scientists at MIT published findings in Nature showing a direct link between sleep quality and cognitive function in adults aged 35–54...'"}
-                      rows={8}
-                      maxLength={30000}
-                      className="w-full bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.07] rounded-xl text-slate-900 dark:text-slate-200 text-sm leading-relaxed p-4 resize-y outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 min-h-[180px]"
-                    />
-                    <div className="flex justify-between items-center mt-2 px-1 text-xs text-slate-500 dark:text-slate-600">
-                      <span>{text.length} chars · {wordCount} words</span>
-                      {text && (
-                        <button
-                          onClick={() => { setText(""); setResult(null); }}
-                          className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-400 transition-colors focus:outline-none focus:underline"
-                        >
-                          ✕ Clear
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-500/[0.08] border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm" role="alert">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {error}
-                    </div>
-                  )}
-
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    onClick={() => { setText(""); onAnalyze(null); setError(""); }}
+                    className="flex-1 sm:flex-none px-6 py-3 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                  >
+                    Clear
+                  </button>
                   <button
                     onClick={handleAnalyze}
-                    disabled={loading}
-                    className="mt-5 w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-xl shadow-indigo-600/25 hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-[#0d0d1a]"
+                    disabled={loading || !modelReady}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-lg bg-[#135bec] text-white font-bold shadow-lg shadow-blue-600/30 hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                   >
                     {loading ? (
                       <>
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                          <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
-                        </svg>
-                        <span>Analyzing with AI…</span>
+                        <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707" /></svg>
+                        <span>Analyzing...</span>
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-                        </svg>
-                        <span>Analyze Now</span>
+                        <span>Analyze News</span>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                       </>
                     )}
                   </button>
-                </motion.div>
-              )}
+                </div>
+              </div>
+            </motion.div>
+          )}
 
-              {tab === "file" && (
-                <motion.div key="file" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <div
-                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                    onDragLeave={() => setDragOver(false)}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Upload a file"
-                    className={`border-2 border-dashed rounded-xl p-8 md:p-12 text-center cursor-pointer transition-all duration-200 ${dragOver
-                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-500/[0.06]"
-                        : "border-slate-200 dark:border-white/[0.08] hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-white/[0.02]"
-                      }`}
-                  >
-                    <input ref={fileInputRef} type="file" accept=".txt,.csv" hidden onChange={(e) => e.target.files?.[0] && setFile(e.target.files[0])} />
-                    <svg className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <p className="text-slate-600 dark:text-slate-400 mb-1 font-medium">
-                      Drag & drop or <span className="text-indigo-600 dark:text-indigo-400 font-semibold">browse files</span>
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-600 text-sm">Supports .txt and .csv files up to 2MB</p>
-                    {file && (
-                      <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/[0.08] border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-medium">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        {file.name}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={handleFileAnalyze}
-                    disabled={!file || loading}
-                    className="mt-5 w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    {loading ? "Analyzing…" : "Analyze File"}
-                  </button>
-                </motion.div>
-              )}
-
-              {tab === "examples" && (
-                <motion.div key="examples" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <p className="text-slate-600 dark:text-slate-500 text-sm mb-4">Click an example to load it into the analyzer:</p>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {EXAMPLES.real.map((ex, i) => (
-                      <button key={`real-${i}`} onClick={() => { setText(ex); setTab("text"); }}
-                        className="text-left p-4 rounded-xl border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/[0.04] hover:bg-emerald-100 dark:hover:bg-emerald-500/[0.08] hover:border-emerald-300 dark:hover:border-emerald-500/40 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <div className="text-[10px] font-bold tracking-widest text-emerald-700 dark:text-emerald-400 mb-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-full inline-block">REAL NEWS</div>
-                        <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed line-clamp-3 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">"{ex}"</p>
-                      </button>
-                    ))}
-                    {EXAMPLES.fake.map((ex, i) => (
-                      <button key={`fake-${i}`} onClick={() => { setText(ex); setTab("text"); }}
-                        className="text-left p-4 rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/[0.04] hover:bg-red-100 dark:hover:bg-red-500/[0.08] hover:border-red-300 dark:hover:border-red-500/40 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-red-500">
-                        <div className="text-[10px] font-bold tracking-widest text-red-700 dark:text-red-400 mb-2 px-2 py-0.5 bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-full inline-block">FAKE NEWS</div>
-                        <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed line-clamp-3 group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">"{ex}"</p>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-
-        {/* Results */}
-        <div ref={resultRef} id="results-section">
-          <AnimatePresence>
-            {result && (
-              <ResultPanel
-                result={result}
-                onReset={() => setResult(null)}
-              />
-            )}
-          </AnimatePresence>
-        </div>
+          {tab === "file" && (
+            <motion.div key="file" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div
+                className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-12 text-center hover:border-[#135bec] hover:bg-[#135bec]/5 transition-all cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input ref={fileInputRef} type="file" accept=".txt,.csv" hidden onChange={(e) => { e.target.files?.[0] && setFile(e.target.files[0]); }} />
+                <svg className="w-12 h-12 text-slate-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-slate-600 dark:text-slate-300 font-medium mb-1">Click to upload or drag and drop</p>
+                <p className="text-slate-400 text-sm">.txt or .csv files (max 2MB)</p>
+                {file && <div className="mt-4 text-[#135bec] font-bold text-sm bg-[#135bec]/10 py-1 px-3 rounded-full inline-block">{file.name}</div>}
+              </div>
+              <button
+                onClick={handleFileAnalyze}
+                disabled={!file || loading}
+                className="mt-6 w-full py-3 rounded-lg bg-[#135bec] text-white font-bold shadow-lg hover:bg-blue-600 disabled:opacity-50 transition-all"
+              >
+                {loading ? "Processing..." : "Analyze File"}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </section>
+
+      {/* Footer Disclaimer */}
+      <div className="px-6 py-3 bg-slate-50 dark:bg-[#101622]/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+        Secured by Neural Network Verifier v4.2
+      </div>
+    </div>
   );
 }

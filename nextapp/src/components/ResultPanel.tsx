@@ -29,7 +29,7 @@ export default function ResultPanel({ result, onReset }: ResultPanelProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-      className="mt-6 rounded-2xl border border-slate-200 dark:border-white/[0.07] bg-white dark:bg-[#0d0d1a]/80 dark:backdrop-blur-xl shadow-xl dark:shadow-2xl overflow-hidden"
+      className="mt-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e293b] shadow-xl dark:shadow-2xl overflow-hidden"
       role="region"
       aria-label="Analysis Results"
     >
@@ -39,8 +39,8 @@ export default function ResultPanel({ result, onReset }: ResultPanelProps) {
           {/* Badge */}
           <div
             className={`flex items-center gap-4 px-6 py-4 rounded-xl border flex-shrink-0 ${isFake
-                ? "bg-red-100 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 shadow-lg dark:shadow-red-500/20"
-                : "bg-emerald-100 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shadow-lg dark:shadow-emerald-500/20"
+              ? "bg-red-100 dark:bg-red-500/10 border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 shadow-lg dark:shadow-red-500/20"
+              : "bg-emerald-100 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shadow-lg dark:shadow-emerald-500/20"
               }`}
           >
             <div
@@ -76,8 +76,8 @@ export default function ResultPanel({ result, onReset }: ResultPanelProps) {
             <div className="h-3 bg-slate-200 dark:bg-white/[0.05] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full confidence-bar ${isFake
-                    ? "bg-gradient-to-r from-red-500 to-rose-400"
-                    : "bg-gradient-to-r from-emerald-500 to-teal-400"
+                  ? "bg-gradient-to-r from-red-500 to-rose-400"
+                  : "bg-gradient-to-r from-emerald-500 to-teal-400"
                   }`}
                 style={{ width: `${confWidth}%` }}
                 role="progressbar"
