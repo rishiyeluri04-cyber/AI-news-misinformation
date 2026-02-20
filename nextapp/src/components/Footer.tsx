@@ -29,7 +29,6 @@ export default function Footer() {
               <li><a href="#how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Methodology</a></li>
               <li><a href="#pricing" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Pricing Plans</a></li>
               <li><a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">FAQ</a></li>
-              <li><a href="https://github.com/Bunnyvalluri/Ai-based-news" target="_blank" rel="noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Source Code</a></li>
             </ul>
           </div>
 
