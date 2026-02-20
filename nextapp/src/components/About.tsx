@@ -169,15 +169,14 @@ export default function About() {
               {MARQUEE_ITEMS.map((tech, i) => (
                 <div
                   key={`${tech.name}-${i}`}
-                  className="px-5 py-2.5 rounded-full border shadow-sm flex items-center gap-3 whitespace-nowrap transition-all duration-300 cursor-default"
-                  style={{
-                    backgroundColor: tech.bg,
-                    borderColor: tech.border,
-                    color: tech.color
-                  }}
+                  className="px-5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shadow-sm flex items-center gap-3 whitespace-nowrap transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-700 group cursor-default"
                 >
-                  <span className="flex-shrink-0">{tech.icon}</span>
-                  <span className="text-sm font-bold">{tech.name}</span>
+                  <span className="flex-shrink-0 transition-transform duration-300 group-hover:scale-110" style={{ color: tech.color }}>
+                    {tech.icon}
+                  </span>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                    {tech.name}
+                  </span>
                 </div>
               ))}
             </div>
