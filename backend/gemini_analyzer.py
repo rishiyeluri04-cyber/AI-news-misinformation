@@ -4,13 +4,15 @@ Provides deep contextual analysis using Google's Gemini 1.5 Flash model
 as a second-opinion layer alongside the ML classifier.
 """
 
+import os
 import logging
 import re
 import json
 
 logger = logging.getLogger(__name__)
 
-GEMINI_API_KEY = "AIzaSyDSp_ewIo8Ml9Ym8NX-AjaWlsUx-lGzG9o"
+# Primary key from environment; fallback to placeholder (user must provide their own key)
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY_HERE")
 _gemini_model = None
 _gemini_available = False
 

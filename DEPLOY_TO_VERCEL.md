@@ -28,7 +28,7 @@ Choose "Continue with GitHub" or email. A browser window will open.
 ## Step 3 — Initialize Git (if not already done)
 
 ```bash
-cd "c:\Users\vallu\OneDrive\Desktop\mywebside\ai-based fake news detection\nextapp"
+cd nextapp
 git init
 git add .
 git commit -m "Initial commit: TruthLens Next.js + React + Tailwind"
@@ -39,7 +39,7 @@ git commit -m "Initial commit: TruthLens Next.js + React + Tailwind"
 ## Step 4 — Deploy to Vercel
 
 ```bash
-cd "c:\Users\vallu\OneDrive\Desktop\mywebside\ai-based fake news detection\nextapp"
+cd nextapp
 vercel
 ```
 
@@ -60,7 +60,7 @@ If you want to move the Gemini API key out of the code:
 
 1. Go to https://vercel.com/dashboard
 2. Select your project → **Settings** → **Environment Variables**
-3. Add: `GEMINI_API_KEY` = `AIzaSyDSp_ewIo8Ml9Ym8NX-AjaWlsUx-lGzG9o`
+3. Add: `GEMINI_API_KEY` = `YOUR_GEMINI_API_KEY`
 4. Then update `backend/gemini_analyzer.py`:
    ```python
    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")

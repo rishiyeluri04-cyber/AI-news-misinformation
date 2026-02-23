@@ -24,21 +24,18 @@ logger = logging.getLogger(__name__)
 NLTK_PACKAGES = ['punkt', 'stopwords', 'wordnet', 'omw-1.4', 'punkt_tab']
 for pkg in NLTK_PACKAGES:
     try:
-        # Try to find it first to avoid redundant downloads
+        # Check if already present
+        if pkg == 'punkt': nltk.data.find('tokenizers/punkt')
+        elif pkg == 'stopwords': nltk.data.find('corpora/stopwords')
+        elif pkg == 'wordnet': nltk.data.find('corpora/wordnet')
+        else: nltk.data.find(pkg)
+    except LookupError:
         try:
-            if pkg == 'punkt': nltk.data.find('tokenizers/punkt')
-            elif pkg == 'stopwords': nltk.data.find('corpora/stopwords')
-            elif pkg == 'wordnet': nltk.data.find('corpora/wordnet')
-            else: nltk.data.find(pkg)
-        except LookupError:
-             # Download to /tmp if not found
-             download_dir = '/tmp' if os.path.exists('/tmp') else None
-             if download_dir:
-                 nltk.download(pkg, download_dir=download_dir, quiet=True)
-             else:
-                 nltk.download(pkg, quiet=True)
-    except Exception as e:
-        logger.warning(f"Could not download NLTK package '{pkg}': {e}")
+            download_dir = '/tmp' if os.path.exists('/tmp') else None
+            nltk.download(pkg, download_dir=download_dir, quiet=True, halt_on_error=False)
+        except Exception:
+            pass # Ignore lock errors or network issues, hope for fallback
+
 
 # Import NLTK modules AFTER download
 from nltk.corpus import stopwords
